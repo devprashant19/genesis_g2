@@ -277,7 +277,7 @@ function App() {
               SPIDEY-SENSE
             </h1>
             <p className="text-label text-muted" style={{ marginTop: 8, letterSpacing: '0.2em' }}>
-              TACTICAL COMMAND AUTHENTICATION
+              FRIENDLY NEIGHBOURHOOD OPERATIVE LOGIN
             </p>
           </div>
 
@@ -293,7 +293,7 @@ function App() {
                   value={playerName}
                   onChange={e => setPlayerName(e.target.value)}
                   required
-                  placeholder="Enter callsign"
+                  placeholder="Enter your hero callsign"
                   style={{ paddingBottom: 8 }}
                 />
               </div>
@@ -307,7 +307,7 @@ function App() {
                   value={playerEmail}
                   onChange={e => setPlayerEmail(e.target.value)}
                   required
-                  placeholder="Enter email"
+                  placeholder="your@email.com"
                   style={{ paddingBottom: 8 }}
                 />
               </div>
@@ -339,7 +339,7 @@ function App() {
               boxShadow: '0 0 8px #82cfff',
               animation: 'spideyBlink 2s infinite',
             }} />
-            <span className="text-label text-muted">SYSTEM_SECURE</span>
+            <span className="text-label text-muted">SPIDER-NET_SECURE</span>
           </div>
         </main>
 
@@ -395,10 +395,10 @@ function App() {
             }}
           >
             <h1 className="text-display-md" style={{ textTransform: 'uppercase', letterSpacing: '-0.01em' }}>
-              Awaiting Deployment
+              Suit Up, Hero
             </h1>
             <p className="text-label" style={{ color: '#ffb4ac', marginTop: 8, letterSpacing: '0.2em', animation: 'spideyBlink 2s infinite' }}>
-              WAITING FOR HOST TO INITIATE SEQUENCE...
+              SPIDER-SENSE ONLINE — WAITING FOR NICK FURY'S SIGNAL...
             </p>
           </div>
 
@@ -406,7 +406,7 @@ function App() {
           <div style={{ position: 'fixed', bottom: 32, left: 32, display: 'flex', flexDirection: 'column', gap: 4 }}>
             <div className="text-label text-muted" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span className="material-symbols-outlined" style={{ fontSize: 16 }}>signal_cellular_alt</span>
-              UPLINK STATUS: <span style={{ color: '#82cfff' }}>SECURE</span>
+              WEB-UPLINK: <span style={{ color: '#82cfff' }}>SECURE</span>
             </div>
             <LatencyDisplay />
           </div>
@@ -419,9 +419,9 @@ function App() {
   // SELECT ABILITY
   if (gameState === 'SELECT_ABILITY') {
     const abilities: { id: Ability; icon: string; label: string; desc: string }[] = [
-      { id: 'SPEED',    icon: 'speed',    label: 'SPEED',    desc: '+30s per task — more time on each mission' },
-      { id: 'STRENGTH', icon: 'bolt',     label: 'STRENGTH', desc: '+5 pts per correct answer — power through' },
-      { id: 'DEFENCE',  icon: 'shield',   label: 'DEFENCE',  desc: '-2 penalty (instead of -10) — stay safe' },
+      { id: 'SPEED',    icon: 'speed',    label: 'WEB-SPEED',    desc: 'More time per mission — swing faster than Vulture' },
+      { id: 'STRENGTH', icon: 'bolt',     label: 'SPIDER-STRENGTH', desc: '+5 pts per correct hit — punch like Rhino' },
+      { id: 'DEFENCE',  icon: 'shield',   label: 'VENOM-SHIELD',  desc: 'Reduced penalty — take a hit like the Iron Spider' },
     ];
     return (
       <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden', background: '#0a0a0a' }}>
@@ -436,9 +436,9 @@ function App() {
         }}>
           <div style={{ textAlign: 'center' }}>
             <h1 className="text-display-md text-crimson" style={{ textTransform: 'uppercase', marginBottom: 8 }}>
-              SELECT MODIFIER
+              CHOOSE YOUR POWER
             </h1>
-            <p className="text-body text-muted">This modifier applies to all your missions. Choose wisely.</p>
+            <p className="text-body text-muted">Pick your super ability — Peter Parker only gets one. Choose wisely.</p>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20, width: '100%' }}>
@@ -511,9 +511,9 @@ function App() {
         <main style={{ position: 'relative', zIndex: 10, padding: '80px 24px 32px' }}>
           {/* Header */}
           <div style={{ marginBottom: 24, borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: 16 }}>
-            <h1 className="text-display-md" style={{ textTransform: 'uppercase', letterSpacing: '-0.01em' }}>Mission Control</h1>
+            <h1 className="text-display-md" style={{ textTransform: 'uppercase', letterSpacing: '-0.01em' }}>Spider HQ</h1>
             <p className="text-label" style={{ color: '#e62429', marginTop: 4 }}>
-              COMPLETED: {completedGames.length} / 7 — SELECT YOUR NEXT OBJECTIVE
+              WEBS CAST: {completedGames.length} / 7 — PICK YOUR NEXT TARGET
             </p>
           </div>
 
@@ -556,7 +556,7 @@ function App() {
                       <span className="material-symbols-outlined" style={{ color: '#ffb4ac', fontSize: 20, fontVariationSettings: "'FILL' 1" }}>{icon}</span>
                     </div>
                     <span className="text-label" style={{ color: isCompleted ? '#22c55e' : 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>
-                      {isCompleted ? '✓ DONE' : 'LOCKED'}
+                      {isCompleted ? '✓ WEBBED' : 'TARGET'}
                     </span>
                   </div>
 
@@ -585,7 +585,7 @@ function App() {
                         fontWeight: 500,
                       }}
                     >
-                      {isCompleted ? '[ COMPLETE ]' : '[ DEPLOY ]'}
+                      {isCompleted ? '[ WEBBED UP ]' : '[ SWING IN ]'}
                     </div>
                   </div>
                 </div>
@@ -670,7 +670,11 @@ function App() {
         >
           <div className="corner-red-tl" /><div className="corner-red-tr" /><div className="corner-red-bl" /><div className="corner-red-br" />
 
-          <h1 className="text-display-md" style={{ textTransform: 'uppercase', marginBottom: 16 }}>SYSTEM OVERRIDE COMPLETE</h1>
+          <h1 className="text-display-md" style={{ textTransform: 'uppercase', marginBottom: 16 }}>NEIGHBOURHOOD SECURED!</h1>
+
+          <p className="text-body text-muted" style={{ marginBottom: 24, fontStyle: 'italic' }}>
+            With great power comes great responsibility — and great scores.
+          </p>
 
           <div
             className="text-display-lg"
@@ -688,7 +692,7 @@ function App() {
               animation: 'spideyBlink 2s infinite',
             }}
           >
-            AWAITING GLOBAL LEADERBOARD SYNC...
+            SYNCING WITH DAILY BUGLE LEADERBOARD...
           </div>
         </div>
 
@@ -706,8 +710,8 @@ function App() {
 
         <main style={{ position: 'relative', zIndex: 10, maxWidth: 800, margin: '0 auto', padding: '80px 24px 40px' }}>
           <div style={{ marginBottom: 32 }}>
-            <h1 className="text-display-md" style={{ textTransform: 'uppercase' }}>GLOBAL RANKINGS</h1>
-            <p className="text-label text-muted" style={{ marginTop: 4 }}>LIVE FEED // UPLINK SECURE</p>
+            <h1 className="text-display-md" style={{ textTransform: 'uppercase' }}>DAILY BUGLE RANKINGS</h1>
+            <p className="text-label text-muted" style={{ marginTop: 4 }}>LIVE FEED // WHO'S THE BEST SPIDEY?</p>
           </div>
 
           <div className="glass-panel" style={{ borderRadius: 4, overflow: 'hidden' }}>
@@ -723,7 +727,7 @@ function App() {
               }}
             >
               <span>RANK</span>
-              <span>OPERATIVE</span>
+              <span>HERO</span>
               <span style={{ textAlign: 'right' }}>SCORE</span>
               <span style={{ textAlign: 'right' }}>PTS</span>
             </div>
