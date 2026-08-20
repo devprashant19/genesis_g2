@@ -1,113 +1,94 @@
-import { useState, useEffect } from 'react'
-import { io, Socket } from 'socket.io-client'
-import './App.css'
+import { useState, useEffect } from 'react';
+import { io, Socket } from 'socket.io-client';
 
-// Hardcoded for now. In a real scenario, this would come from an env var.
 const SOCKET_URL = 'http://localhost:3001';
+const PASSCODE = '1234'; // In a real app, this should be secret
 
 function App() {
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [isConnected, setIsConnected] = useState(false);
-  const [passcode, setPasscode] = useState('');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [activePlayers, setActivePlayers] = useState(0);
+  const [lobbyCount, setLobbyCount] = useState(0);
+  const [leaderboard, setLeaderboard] = useState<Array<{playerId: string, score: number}> | null>(null);
 
   useEffect(() => {
-    // We only connect the socket when the admin submits the correct passcode
-    if (isAuthenticated && !socket) {
-      const newSocket = io(SOCKET_URL, {
-        auth: {
-          token: 'admin-secret-token' // In real life, use proper JWT after login
-        }
-      });
+    // Admin connects just like a player, but maybe we could have a specific admin auth
+    const newSocket = io(SOCKET_URL);
+    
+    newSocket.on('connect', () => {
+      console.log('Admin connected');
+    });
 
-      newSocket.on('connect', () => setIsConnected(true));
-      newSocket.on('disconnect', () => setIsConnected(false));
-      
-      // Listen for lobby updates
-      newSocket.on('lobby_count', (count: number) => {
-        setActivePlayers(count);
-      });
+    // Listen for lobby updates (this needs backend support to broadcast to everyone)
+    // For now, we'll just poll or rely on a specific event
+    newSocket.on('LOBBY_UPDATE', (count: number) => {
+      setLobbyCount(count);
+    });
 
-      setSocket(newSocket);
+    newSocket.on('SHOW_LEADERBOARD', (board: Array<{playerId: string, score: number}>) => {
+      setLeaderboard(board);
+    });
 
-      return () => {
-        newSocket.close();
-      };
-    }
-  }, [isAuthenticated, socket]);
+    setSocket(newSocket);
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (passcode === '1234') { // Mock passcode logic
-      setIsAuthenticated(true);
-    } else {
-      alert('Invalid passcode');
-    }
+    return () => {
+      newSocket.close();
+    };
+  }, []);
+
+  const handleStartGame = () => {
+    if (!socket) return;
+    socket.emit('trigger_start', { passcode: PASSCODE });
+    alert('Start signal sent!');
   };
 
-  const handleStartEvent = () => {
-    if (socket) {
-      socket.emit('trigger_start', { passcode: '1234' });
-    }
+  const handleRevealLeaderboard = () => {
+    if (!socket) return;
+    socket.emit('admin_reveal_leaderboard', { passcode: PASSCODE });
+    alert('Leaderboard reveal sent!');
   };
-
-  if (!isAuthenticated) {
-    return (
-      <div className="login-container">
-        <h1>Admin Control Panel</h1>
-        <form onSubmit={handleLogin}>
-          <input 
-            type="password" 
-            value={passcode} 
-            onChange={(e) => setPasscode(e.target.value)}
-            placeholder="Enter Admin Passcode"
-          />
-          <button type="submit">Access System</button>
-        </form>
-      </div>
-    );
-  }
 
   return (
-    <div className="admin-dashboard">
-      <header>
-        <h1>Spider-Man: Power Grid Challenge - LIVE CONTROL</h1>
-        <div className={`status ${isConnected ? 'online' : 'offline'}`}>
-          {isConnected ? '● Connected to Server' : '○ Disconnected'}
-        </div>
-      </header>
-
-      <main>
-        <section className="lobby-counter">
-          <h2>Players Ready</h2>
-          <div className="count-display">
-            <span className="current">{activePlayers}</span>
-            <span className="max">/ 1000</span>
+    <div className="gamified-theme" style={{ minHeight: '100vh', position: 'relative' }}>
+      <div className="bg-grid-fade" />
+      <div className="bg-grid" style={{ position: 'absolute', inset: 0, opacity: 0.3 }} />
+      
+      <div style={{ position: 'relative', zIndex: 10, padding: '4rem 1rem', maxWidth: 800, margin: '0 auto' }}>
+        <h1 className="text-glow-pink" style={{ textAlign: 'center', marginBottom: '3rem' }}>HOST OVERRIDE TERMINAL</h1>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+          <div className="box-arcade" style={{ padding: '2rem', textAlign: 'center' }}>
+            <h2 style={{ color: 'var(--arcade-neon-cyan)', marginBottom: '1rem' }}>SYSTEM STATUS</h2>
+            <div style={{ fontSize: '3rem', color: 'white', marginBottom: '1rem' }}>
+              {lobbyCount}
+            </div>
+            <p style={{ color: 'var(--muted-foreground)' }}>Active Connections</p>
           </div>
-        </section>
-
-        <section className="actions" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <button 
-            className="start-btn" 
-            onClick={handleStartEvent}
-            disabled={!isConnected}
-          >
-            START EVENT (Broadcast GAME_START)
-          </button>
           
-          <button 
-            className="leaderboard-btn" 
-            onClick={() => socket?.emit('trigger_leaderboard', { passcode: '1234' })}
-            disabled={!isConnected}
-            style={{ backgroundColor: '#007bff' }}
-          >
-            REVEAL LEADERBOARD
-          </button>
-        </section>
-      </main>
+          <div className="glass-card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem', justifyContent: 'center' }}>
+            <button className="btn-arcade" onClick={handleStartGame} style={{ padding: '1rem' }}>
+              INITIATE SEQUENCE
+            </button>
+            <button className="btn-arcade" onClick={handleRevealLeaderboard} style={{ padding: '1rem', filter: 'hue-rotate(90deg)' }}>
+              REVEAL LEADERBOARD
+            </button>
+          </div>
+        </div>
+
+        {leaderboard && (
+          <div className="glass-card" style={{ marginTop: '3rem', padding: '2rem' }}>
+            <h2 className="text-glow-cyan" style={{ marginBottom: '2rem' }}>LIVE RANKINGS</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {leaderboard.map((entry, idx) => (
+                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                  <span>#{idx + 1} {entry.playerId.substring(0,6)}</span>
+                  <span style={{ color: 'var(--arcade-neon-yellow)' }}>{entry.score} PTS</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
