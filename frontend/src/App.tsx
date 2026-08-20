@@ -612,7 +612,7 @@ function App() {
         <div className="scan-line-el" style={{ zIndex: 2 }} />
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(19,19,19,0.8)', backdropFilter: 'blur(2px)', zIndex: 1 }} />
 
-        {/* Top bar */}
+        {/* Top bar — NO back button; timer locked in */}
         <header style={{
           position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
           height: 64,
@@ -622,15 +622,18 @@ function App() {
           backdropFilter: 'blur(12px)',
           borderBottom: '1px solid rgba(255,255,255,0.15)',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <button
-              onClick={() => setGameState('SELECT_ELEMENTS')}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ffb4ac' }}
-            >
-              <span className="material-symbols-outlined" style={{ fontSize: 24 }}>arrow_back</span>
-            </button>
-            <div className="text-display-md text-crimson" style={{ fontSize: 20, fontWeight: 800 }}>SPIDEY-SENSE</div>
+          {/* Brand — no back button */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span className="material-symbols-outlined" style={{ color: '#e62429', fontSize: 22, fontVariationSettings: "'FILL' 1" }}>crisis_alert</span>
+            <div className="text-display-md text-crimson" style={{ fontSize: 18, fontWeight: 800 }}>SPIDEY-SENSE</div>
           </div>
+
+          {/* Mission name */}
+          <div className="text-label text-muted" style={{ letterSpacing: '0.12em', fontSize: 11 }}>
+            MISSION: {activeGame.name.toUpperCase()}
+          </div>
+
+          {/* Score */}
           <div className="text-data" style={{ color: '#ffb4ac' }}>{score} PTS</div>
         </header>
 
@@ -652,6 +655,7 @@ function App() {
       </div>
     );
   }
+
 
   // FINISHED
   if (gameState === 'FINISHED') {

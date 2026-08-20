@@ -171,41 +171,85 @@ export default function MiniGamePlaceholder({ gameId, taskTimeMs = 15000, onComp
   const resultQuip = timedOut ? timeoutQuip : (selected === trueCorrectIndex ? correctQuip : wrongQuip);
 
   return (
-    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 24 }}>
+    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-      {/* Timer ring */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+      {/* ── Full-width Countdown Bar ── */}
+      <div style={{ width: '100%' }}>
+        {/* Label row */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }} className="text-label">
+          <span style={{ color: isUrgent ? '#ff4444' : '#e62429', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 14 }}>timer</span>
+            {isUrgent ? 'HURRY — TIME RUNNING OUT!' : 'TIME REMAINING'}
+          </span>
+          <span
+            style={{
+              color: isUrgent ? '#ff4444' : '#ffb4ac',
+              fontWeight: 800,
+              fontSize: 22,
+              fontFamily: 'var(--font-mono)',
+              animation: isUrgent ? 'spideyBlink 0.5s infinite' : 'none',
+            }}
+          >
+            {timeLeft}s
+          </span>
+        </div>
+
+        {/* Bar track */}
         <div
           style={{
-            width: 64, height: 64, borderRadius: '50%',
-            border: '2px solid #e62429',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            width: '100%', height: 10,
+            background: 'rgba(255,255,255,0.06)',
+            border: `1px solid ${isUrgent ? 'rgba(255,68,68,0.4)' : 'rgba(230,36,41,0.3)'}`,
+            overflow: 'hidden',
             position: 'relative',
-            boxShadow: isUrgent ? '0 0 25px rgba(230,36,41,0.9)' : '0 0 20px rgba(230,36,41,0.6)',
-            background: 'rgba(255,255,255,0.03)',
-            backdropFilter: 'blur(12px)',
           }}
         >
-          <svg
-            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', transform: 'rotate(-90deg)' }}
-            viewBox="0 0 100 100"
+          <div
+            style={{
+              height: '100%',
+              width: `${progress * 100}%`,
+              background: isUrgent
+                ? 'linear-gradient(90deg, #ff2222, #ff6666)'
+                : 'linear-gradient(90deg, #e62429, #ff6b6b)',
+              boxShadow: isUrgent ? '0 0 12px rgba(255,68,68,0.8)' : '0 0 8px rgba(230,36,41,0.5)',
+              transition: 'width 1s linear, background 0.3s',
+            }}
+          />
+        </div>
+
+        {/* SVG ring — compact, right-aligned below bar */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 6 }}>
+          <div
+            style={{
+              width: 44, height: 44, borderRadius: '50%',
+              border: `2px solid ${isUrgent ? '#ff4444' : '#e62429'}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              position: 'relative',
+              boxShadow: isUrgent ? '0 0 20px rgba(255,68,68,0.8)' : '0 0 12px rgba(230,36,41,0.4)',
+              background: 'rgba(255,255,255,0.03)',
+            }}
           >
-            <circle cx="50" cy="50" r="48" fill="none" stroke="rgba(230,36,41,0.2)" strokeWidth="3" />
-            <circle
-              cx="50" cy="50" r="48" fill="none"
-              stroke={isUrgent ? '#ff2222' : '#e62429'}
-              strokeWidth="3"
-              strokeDasharray={circumference}
-              strokeDashoffset={dashOffset}
-              style={{ transition: 'stroke-dashoffset 1s linear' }}
-            />
-          </svg>
-          <span
-            className="text-data"
-            style={{ color: isUrgent ? '#ff4444' : '#e62429', position: 'relative', zIndex: 1, fontSize: 16 }}
-          >
-            {timeLeft}
-          </span>
+            <svg
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', transform: 'rotate(-90deg)' }}
+              viewBox="0 0 100 100"
+            >
+              <circle cx="50" cy="50" r="48" fill="none" stroke="rgba(230,36,41,0.15)" strokeWidth="4" />
+              <circle
+                cx="50" cy="50" r="48" fill="none"
+                stroke={isUrgent ? '#ff2222' : '#e62429'}
+                strokeWidth="4"
+                strokeDasharray={circumference}
+                strokeDashoffset={dashOffset}
+                style={{ transition: 'stroke-dashoffset 1s linear' }}
+              />
+            </svg>
+            <span
+              className="text-data"
+              style={{ color: isUrgent ? '#ff4444' : '#e62429', position: 'relative', zIndex: 1, fontSize: 12 }}
+            >
+              {timeLeft}
+            </span>
+          </div>
         </div>
       </div>
 
