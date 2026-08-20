@@ -13,14 +13,12 @@ function App() {
   const [gameState, setGameState] = useState<GameState>('LOBBY');
   const [socket, setSocket] = useState<Socket | null>(null);
   
-  // Player state
   const [playerName, setPlayerName] = useState('');
   const [playerPhone, setPlayerPhone] = useState('');
   const [playerId, setPlayerId] = useState('');
   const [isRegistered, setIsRegistered] = useState(false);
   const [leaderboard, setLeaderboard] = useState<Array<{playerId: string, score: number}>>([]);
   
-  // Gameplay state
   const [ability, setAbility] = useState<Ability | null>(null);
   const [completedGames, setCompletedGames] = useState<string[]>([]);
   const [activeGame, setActiveGame] = useState<MiniGame | null>(null);
@@ -53,19 +51,15 @@ function App() {
 
   const connectSocket = (token: string) => {
     const newSocket = io(SOCKET_URL, { auth: { token } });
-
     newSocket.on('connect', () => console.log('Connected to server lobby'));
-
     newSocket.on('GAME_START', () => {
-      setRoundStartMs(Date.now()); // Start the round timer
+      setRoundStartMs(Date.now());
       setGameState('SELECT_ABILITY');
     });
-    
     newSocket.on('SHOW_LEADERBOARD', (board: Array<{playerId: string, score: number}>) => {
       setLeaderboard(board);
       setGameState('LEADERBOARD_VIEW');
     });
-
     setSocket(newSocket);
   };
 
@@ -75,8 +69,8 @@ function App() {
   };
 
   const handleGameSelect = (game: MiniGame) => {
-    if (completedGames.includes(game.id)) return; // Already played
-    if (completedGames.length >= 7) return; // Reached limit
+    if (completedGames.includes(game.id)) return;
+    if (completedGames.length >= 7) return;
     setActiveGame(game);
     setGameState('PLAY_GAME');
   };
@@ -84,13 +78,11 @@ function App() {
   const handleGameComplete = async (result: GameResult) => {
     const newResults = [...results, result];
     const newCompleted = [...completedGames, result.gameId];
-    
     setResults(newResults);
     setCompletedGames(newCompleted);
     setActiveGame(null);
 
     if (newCompleted.length >= 7) {
-      // Finished all 7 games, compute and submit
       const payload = buildSubmissionPayload(playerId, ability!, newResults, roundStartMs);
       try {
         const response = await fetch(`${SOCKET_URL}/submit-score`, {
@@ -113,94 +105,109 @@ function App() {
         alert('Failed to submit score');
       }
     } else {
-      // Go back to element selection for the next game
       setGameState('SELECT_ELEMENTS');
     }
   };
 
-  if (!isRegistered) {
-    return (
-      <div className="container">
-        <h1>Spider-Man: Power Grid Challenge</h1>
-        <form onSubmit={handleRegister} className="register-form">
-          <input 
-            type="text" placeholder="Name" value={playerName}
-            onChange={e => setPlayerName(e.target.value)} required />
-          <input 
-            type="tel" placeholder="Phone Number" value={playerPhone}
-            onChange={e => setPlayerPhone(e.target.value)} required />
-          <button type="submit">Join Event</button>
-        </form>
-      </div>
-    );
-  }
-
-  if (gameState === 'LOBBY') {
-    return (
-      <div className="container">
-        <h1>Waiting in Lobby...</h1>
-        <p>Waiting for Admin start signal.</p>
-      </div>
-    );
-  }
-
-  if (gameState === 'SELECT_ABILITY') {
-    return (
-      <div className="container">
-        <h1>Select your Ability</h1>
-        <p>This modifier applies to all your tasks.</p>
-        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 24 }}>
-          <button onClick={() => handleAbilitySelect('SPEED')}>Speed (+30s per task)</button>
-          <button onClick={() => handleAbilitySelect('STRENGTH')}>Strength (+5 points per correct task)</button>
-          <button onClick={() => handleAbilitySelect('DEFENCE')}>Defence (-2 penalty instead of -10)</button>
+  // Helper to render the inner content
+  const renderContent = () => {
+    if (!isRegistered) {
+      return (
+        <div className="glass-card" style={{ maxWidth: 400, margin: '0 auto', padding: '2rem', borderRadius: 8 }}>
+          <h1 className="text-glow-cyan" style={{ textAlign: 'center', marginBottom: '2rem' }}>Spider-Man: Power Grid</h1>
+          <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <input 
+              type="text" placeholder="Hero Name" value={playerName}
+              onChange={e => setPlayerName(e.target.value)} required 
+              style={{ padding: '12px', background: 'rgba(0,0,0,0.5)', border: '1px solid var(--arcade-neon-cyan)', color: 'white', borderRadius: 4 }}
+            />
+            <input 
+              type="tel" placeholder="Comm Link (Phone)" value={playerPhone}
+              onChange={e => setPlayerPhone(e.target.value)} required 
+              style={{ padding: '12px', background: 'rgba(0,0,0,0.5)', border: '1px solid var(--arcade-neon-cyan)', color: 'white', borderRadius: 4 }}
+            />
+            <button type="submit" className="btn-arcade" style={{ padding: '16px', marginTop: '1rem' }}>ENTER GRID</button>
+          </form>
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
-  if (gameState === 'SELECT_ELEMENTS') {
-    return (
-      <div className="container">
-        <h1>Mission Control</h1>
-        <p>Select a mission to play. You have completed {completedGames.length} of 7 tasks.</p>
-        <div className="grid-container" style={{ marginTop: 24 }}>
-          {MINI_GAMES.map((game, i) => {
-            const isCompleted = completedGames.includes(game.id);
-            return (
-              <div 
-                key={game.id} 
-                className={`grid-item ${isCompleted ? 'completed' : ''}`}
-                onClick={() => handleGameSelect(game)}
-                style={{ 
-                  backgroundColor: isCompleted ? '#444' : '#2a2a2a',
-                  color: isCompleted ? '#888' : '#fff',
-                  cursor: isCompleted ? 'not-allowed' : 'pointer',
-                  borderColor: isCompleted ? 'transparent' : '#555',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  padding: 16,
-                  textAlign: 'center'
-                }}
-              >
-                <span style={{ fontSize: '1rem', marginBottom: 8 }}>Mission {i + 1}</span>
-                <span style={{ fontSize: '0.8rem', color: isCompleted ? '#666' : '#aaa' }}>{game.tier}</span>
-                {isCompleted && <span style={{ color: '#28a745', fontSize: '0.9rem', marginTop: 8 }}>COMPLETED</span>}
-              </div>
-            );
-          })}
+    if (gameState === 'LOBBY') {
+      return (
+        <div className="glass-card animate-pulse-fast" style={{ maxWidth: 600, margin: '0 auto', padding: '3rem', textAlign: 'center', borderRadius: 8 }}>
+          <h1 className="text-glow-pink">AWAITING DEPLOYMENT</h1>
+          <p style={{ marginTop: '1rem', color: 'var(--muted-foreground)' }}>Waiting for Host signal to commence...</p>
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
-  if (gameState === 'PLAY_GAME' && activeGame) {
-    const taskTimeMs = getTaskTimeMs(activeGame.timeLimitMs, ability!);
+    if (gameState === 'SELECT_ABILITY') {
+      return (
+        <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
+          <h1 className="text-glow-cyan" style={{ marginBottom: '1rem' }}>SELECT MODIFIER</h1>
+          <p style={{ color: 'var(--muted-foreground)', marginBottom: '3rem' }}>This modifier applies to all your missions.</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem' }}>
+            <button className="btn-arcade" onClick={() => handleAbilitySelect('SPEED')} style={{ padding: '2rem' }}>
+              <div style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>SPEED</div>
+              <div style={{ fontSize: '0.8rem', color: '#ccc' }}>+30s per task</div>
+            </button>
+            <button className="btn-arcade" onClick={() => handleAbilitySelect('STRENGTH')} style={{ padding: '2rem' }}>
+              <div style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>STRENGTH</div>
+              <div style={{ fontSize: '0.8rem', color: '#ccc' }}>+5 pts per correct task</div>
+            </button>
+            <button className="btn-arcade" onClick={() => handleAbilitySelect('DEFENCE')} style={{ padding: '2rem' }}>
+              <div style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>DEFENCE</div>
+              <div style={{ fontSize: '0.8rem', color: '#ccc' }}>-2 penalty (instead of -10)</div>
+            </button>
+          </div>
+        </div>
+      );
+    }
 
-    return (
-      <div className="container">
-        <h2>Active Mission: {activeGame.name}</h2>
-        <p>Tier: {activeGame.tier} | Time Limit: {taskTimeMs / 1000}s</p>
-        <div style={{ marginTop: 32 }}>
+    if (gameState === 'SELECT_ELEMENTS') {
+      return (
+        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            <h1 className="text-glow-pink">MISSION CONTROL</h1>
+            <p style={{ color: 'var(--arcade-neon-yellow)' }}>COMPLETED: {completedGames.length} / 7</p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
+            {MINI_GAMES.map((game, i) => {
+              const isCompleted = completedGames.includes(game.id);
+              return (
+                <div 
+                  key={game.id} 
+                  className={isCompleted ? "glass-card" : "box-arcade animate-shine"}
+                  onClick={() => handleGameSelect(game)}
+                  style={{ 
+                    cursor: isCompleted ? 'not-allowed' : 'pointer',
+                    opacity: isCompleted ? 0.5 : 1,
+                    filter: isCompleted ? 'grayscale(100%)' : 'none',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    padding: '2rem 1rem',
+                    textAlign: 'center',
+                    borderRadius: 8
+                  }}
+                >
+                  <span style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '0.5rem', fontFamily: '"Press Start 2P", cursive' }}>{i + 1}</span>
+                  <span style={{ fontSize: '0.9rem', color: 'var(--arcade-neon-cyan)' }}>{game.tier}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    if (gameState === 'PLAY_GAME' && activeGame) {
+      const taskTimeMs = getTaskTimeMs(activeGame.timeLimitMs, ability!);
+      return (
+        <div className="glass-card" style={{ maxWidth: 800, margin: '0 auto', padding: '2rem', borderRadius: 8 }}>
+          <h2 className="text-glow-cyan" style={{ textAlign: 'center' }}>{activeGame.name}</h2>
+          <p style={{ textAlign: 'center', color: 'var(--arcade-neon-pink)', marginBottom: '2rem' }}>
+            TIER: {activeGame.tier} | TIME: {taskTimeMs / 1000}s
+          </p>
           <MiniGamePlaceholder 
             key={activeGame.id}
             gameId={activeGame.id}
@@ -208,37 +215,51 @@ function App() {
             onComplete={handleGameComplete}
           />
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
-  if (gameState === 'FINISHED') {
-    return (
-      <div className="container">
-        <h1>Event Complete!</h1>
-        <h2>Your Final Score: {finalScore}</h2>
-        <p>Waiting for the global leaderboard reveal...</p>
-      </div>
-    );
-  }
-
-  if (gameState === 'LEADERBOARD_VIEW') {
-    return (
-      <div className="container">
-        <h1>Global Leaderboard</h1>
-        <div style={{ marginTop: 32, textAlign: 'left', display: 'inline-block' }}>
-          {leaderboard.map((entry, idx) => (
-            <div key={idx} style={{ padding: '8px 16px', borderBottom: '1px solid #444', display: 'flex', justifyContent: 'space-between', gap: 64 }}>
-              <span>#{idx + 1} Player {entry.playerId.substring(0,6)}</span>
-              <span style={{ fontWeight: 'bold' }}>{entry.score} pts</span>
-            </div>
-          ))}
+    if (gameState === 'FINISHED') {
+      return (
+        <div className="box-arcade" style={{ maxWidth: 600, margin: '0 auto', padding: '3rem', textAlign: 'center' }}>
+          <h1 className="text-glow-cyan">SYSTEM OVERRIDE COMPLETE</h1>
+          <h2 style={{ fontSize: '3rem', margin: '2rem 0', color: 'var(--arcade-neon-yellow)' }}>{finalScore} PTS</h2>
+          <p className="animate-pulse-fast" style={{ color: 'var(--arcade-neon-pink)' }}>Waiting for global leaderboard sync...</p>
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
-  return null;
+    if (gameState === 'LEADERBOARD_VIEW') {
+      return (
+        <div style={{ maxWidth: 800, margin: '0 auto' }}>
+          <h1 className="text-glow-pink" style={{ textAlign: 'center', marginBottom: '3rem' }}>GLOBAL RANKINGS</h1>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {leaderboard.map((entry, idx) => (
+              <div key={idx} className="glass-card" style={{ padding: '1.5rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: 8 }}>
+                <span style={{ fontSize: '1.5rem', color: idx === 0 ? 'var(--arcade-neon-yellow)' : 'white' }}>
+                  #{idx + 1} {entry.playerId.substring(0,6)}
+                </span>
+                <span style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--arcade-neon-cyan)' }}>
+                  {entry.score}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
+  return (
+    <div className="gamified-theme" style={{ minHeight: '100vh', position: 'relative' }}>
+      <div className="bg-grid-fade" />
+      <div className="bg-grid" style={{ position: 'absolute', inset: 0, opacity: 0.3 }} />
+      <div style={{ position: 'relative', zIndex: 10, padding: '4rem 1rem' }}>
+        {renderContent()}
+      </div>
+    </div>
+  );
 }
 
 export default App;
