@@ -1,0 +1,49 @@
+config:
+  target: 'http://localhost:3001' # Change to Cloud Run URL
+  phases:
+    - duration: 60
+      arrivalRate: 15
+      rampTo: 20
+      name: "Ramp up to 1000 users connecting and registering"
+  engines:
+    socketio-v3: {}
+  processor: "./loadtest-helpers.js"
+
+scenarios:
+  - name: "Full player flow: Register, Connect, wait for Start, Submit Score"
+    engine: socketio-v3
+    flow:
+      - post:
+          url: "/register"
+          json:
+            name: "LoadTester{{ $randomNumber(1000, 9999) }}"
+            phone: "55501{{ $randomNumber(10000, 99999) }}"
+          capture:
+            - json: "$.token"
+              as: "jwt_token"
+            - json: "$.playerId"
+              as: "player_id"
+      - connect:
+          auth:
+            token: "{{ jwt_token }}"
+      - think: 5 # Wait in lobby
+      # Wait for GAME_START (in a real test we'd simulate the admin triggering it)
+      # For now, simulate score submission after a delay
+      - think: 30 # Simulate playing the game
+      - post:
+          url: "/submit-score"
+          headers:
+            Authorization: "Bearer {{ jwt_token }}"
+          json:
+            playerId: "{{ player_id }}"
+            globalAbility: "STRENGTH"
+            totalScore: 105 # Plausible score
+            completionTimeMs: 25000
+            elements:
+              - { gameId: "six_card_shuffle", correct: true, elapsedMs: 3000 }
+              - { gameId: "three_doors", correct: true, elapsedMs: 3000 }
+              - { gameId: "memory_chain", correct: true, elapsedMs: 3000 }
+              - { gameId: "villain_timeline", correct: true, elapsedMs: 3000 }
+              - { gameId: "clue_to_character", correct: true, elapsedMs: 3000 }
+              - { gameId: "actor_match", correct: true, elapsedMs: 3000 }
+              - { gameId: "contexto", correct: true, elapsedMs: 3000 }
