@@ -83,9 +83,19 @@ resource "google_cloud_run_v2_service" "spidey_backend" {
     
     # Needs to handle 1000 sockets. Set concurrency high to handle many idle sockets per container.
     max_instance_request_concurrency = 500
+    
+    timeout = "3600s"
+    session_affinity = true
 
     containers {
       image = var.backend_image_url
+      
+      resources {
+        limits = {
+          cpu    = "2"
+          memory = "4Gi"
+        }
+      }
       
       env {
         name  = "PORT"

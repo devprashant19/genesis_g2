@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
@@ -154,6 +155,15 @@ io.on('connection', async (socket) => {
         await pubClient.publish('LEADERBOARD_CHANNEL', JSON.stringify(leaderboard));
       }
     });
+
+    socket.on('trigger_reset', async (data) => {
+      if (data.passcode === '1234') {
+        console.log('Admin triggered RESET');
+        await redisClient.del('leaderboard:round_1');
+        await redisClient.del('game:current_state');
+        await pubClient.publish('RESET_CHANNEL', JSON.stringify({ reset: true }));
+      }
+    });
     
     socket.on('disconnect', () => console.log('Admin disconnected'));
     return;
@@ -176,6 +186,7 @@ io.on('connection', async (socket) => {
 // Setup Redis subscriber for cross-instance broadcasts
 subClient.subscribe('GAME_START_CHANNEL');
 subClient.subscribe('LEADERBOARD_CHANNEL');
+subClient.subscribe('RESET_CHANNEL');
 
 subClient.on('message', (channel, message) => {
   if (channel === 'GAME_START_CHANNEL') {
@@ -184,6 +195,8 @@ subClient.on('message', (channel, message) => {
   } else if (channel === 'LEADERBOARD_CHANNEL') {
     const leaderboard = JSON.parse(message);
     io.emit('SHOW_LEADERBOARD', leaderboard);
+  } else if (channel === 'RESET_CHANNEL') {
+    io.emit('RESET_GAME');
   }
 });
 
