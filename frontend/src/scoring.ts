@@ -1,5 +1,6 @@
-import { TIER_POINTS, WRONG_PENALTY, SPEED_BONUS_SECONDS, getMiniGameById, Ability } from './gameConfig';
-import { GameResult } from './MiniGamePlaceholder';
+import { TIER_POINTS, WRONG_PENALTY, SPEED_BONUS_SECONDS, getMiniGameById } from './gameConfig';
+import type { Ability } from './gameConfig';
+import type { GameResult } from './MiniGamePlaceholder';
 
 export function computeFinalScore(results: GameResult[], ability: Ability, roundStartMs: number) {
   let totalScore = 0;
