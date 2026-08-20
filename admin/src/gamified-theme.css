@@ -1,0 +1,282 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@500;600;700&display=swap');
+
+.gamified-theme {
+  /* Override Global Variables ONLY within this scope */
+  --background: 260 50% 5%;
+  /* Darker Deep Purple for contrast */
+  --foreground: 0 0% 100%;
+
+  --card: 260 50% 10%;
+  --card-foreground: 0 0% 100%;
+
+  --muted: 260 30% 20%;
+  --muted-foreground: 260 20% 70%;
+
+  --border: 280 60% 30%;
+
+  --radius: 4px;
+  /* Slight rounded for modern feel, not fully sharp */
+
+  /* Theme Specific Colors */
+  --arcade-neon-pink: #ff00ff;
+  --arcade-neon-cyan: #00ffff;
+  --arcade-neon-yellow: #ffff00;
+  --arcade-neon-green: #00ff00;
+  --arcade-neon-purple: #bd00ff;
+
+  /* Rich Gradients */
+  --grad-cyber-1: linear-gradient(135deg, #ff00ff 0%, #00ffff 100%);
+  --grad-cyber-2: linear-gradient(to bottom, #2a0a3b, #000000);
+  --grad-glass: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+  --grad-glow-orb: radial-gradient(circle at center, rgba(189, 0, 255, 0.2) 0%, transparent 70%);
+
+  font-family: 'Rajdhani', sans-serif;
+
+  /* Responsive Base Font Size */
+  font-size: 16px;
+}
+
+/* Tablet & Desktop Scaling */
+@media (min-width: 768px) {
+  .gamified-theme {
+    font-size: 18px;
+  }
+}
+
+.gamified-theme h1,
+.gamified-theme h2,
+.gamified-theme h3 {
+  font-family: 'Press Start 2P', cursive;
+  letter-spacing: -1px;
+  line-height: 1.4;
+}
+
+/* Background Grid Animation */
+.gamified-theme .bg-grid {
+  background-size: 40px 40px;
+  background-image:
+    linear-gradient(to right, rgba(255, 0, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
+  animation: scrollGrid 20s linear infinite;
+}
+
+.gamified-theme .bg-grid-fade {
+  background: radial-gradient(circle at 50% 30%, rgba(30, 30, 60, 0) 0%, #090310 90%);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+@keyframes scrollGrid {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 40px 40px;
+  }
+}
+
+/* Utilities */
+.gamified-theme .text-glow-pink {
+  text-shadow: 0 0 5px var(--arcade-neon-pink), 0 0 15px var(--arcade-neon-pink);
+}
+
+.gamified-theme .text-glow-cyan {
+  text-shadow: 0 0 5px var(--arcade-neon-cyan), 0 0 15px var(--arcade-neon-cyan);
+}
+
+.gamified-theme .box-arcade {
+  border: 1px solid var(--arcade-neon-cyan);
+  background: rgba(10, 5, 20, 0.85);
+  box-shadow:
+    0 0 10px rgba(0, 255, 255, 0.3),
+    inset 0 0 20px rgba(0, 255, 255, 0.1);
+  position: relative;
+  backdrop-filter: blur(10px);
+}
+
+/* Corner Accents for Box */
+.gamified-theme .box-arcade::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 20px;
+  height: 20px;
+  border-bottom: 2px solid var(--arcade-neon-pink);
+  border-right: 2px solid var(--arcade-neon-pink);
+}
+
+.gamified-theme .btn-arcade {
+  font-family: 'Press Start 2P', cursive;
+  text-transform: uppercase;
+  border: none;
+  position: relative;
+  background: linear-gradient(180deg, rgba(255, 0, 255, 0.2) 0%, rgba(80, 0, 80, 0.5) 100%);
+  color: white;
+  transition: all 0.2s;
+  box-shadow:
+    inset 0 0 0 2px var(--arcade-neon-pink),
+    0 0 10px var(--arcade-neon-pink);
+  transform: translateY(0);
+  overflow: hidden;
+}
+
+/* Gradient Shine on Hover */
+.gamified-theme .btn-arcade::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: 0.5s;
+}
+
+.gamified-theme .btn-arcade:hover::before {
+  left: 100%;
+}
+
+.gamified-theme .btn-arcade:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 0 0 2px var(--arcade-neon-pink);
+}
+
+.gamified-theme .btn-arcade:disabled {
+  filter: grayscale(100%);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Animations */
+.gamified-theme .animate-glitch {
+  animation: glitch 2s infinite;
+}
+
+@keyframes glitch {
+  0% {
+    transform: translate(0);
+  }
+
+  2% {
+    transform: translate(-2px, 2px);
+  }
+
+  4% {
+    transform: translate(-2px, -2px);
+  }
+
+  6% {
+    transform: translate(2px, 2px);
+  }
+
+  8% {
+    transform: translate(2px, -2px);
+  }
+
+  10% {
+    transform: translate(0);
+  }
+
+  100% {
+    transform: translate(0);
+  }
+}
+
+.gamified-theme .animate-pulse-fast {
+  animation: pulseFast 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulseFast {
+
+  0%,
+  100% {
+    opacity: 1;
+    filter: brightness(1.2);
+  }
+
+  50% {
+    opacity: 0.5;
+    filter: brightness(0.8);
+  }
+}
+
+/* 3D Button Style for Options */
+.gamified-theme .btn-3d {
+  background: linear-gradient(to bottom, #2a0a3b, #150520);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 4px 0 #000,
+    0 5px 10px rgba(0, 0, 0, 0.5);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+/* Glassmorphism Card */
+.gamified-theme .glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
+}
+
+.gamified-theme .glass-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 0, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Gradient Avatar */
+.gamified-theme .avatar-gradient {
+  background: linear-gradient(135deg, var(--arcade-neon-cyan), var(--arcade-neon-purple));
+  box-shadow: 0 0 15px var(--arcade-neon-cyan);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+/* Shine Effect */
+.gamified-theme .animate-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.gamified-theme .animate-shine::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.3) 50%,
+      rgba(255, 255, 255, 0) 100%);
+  transform: skewX(-25deg);
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  0% {
+    left: -100%;
+  }
+
+  20% {
+    left: 200%;
+  }
+
+  100% {
+    left: 200%;
+  }
+}
+
+/* Confetti Particle (Basic CSS) */
+.gamified-theme .particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--arcade-neon-yellow);
+  pointer-events: none;
+  border-radius: 50%;
+}
